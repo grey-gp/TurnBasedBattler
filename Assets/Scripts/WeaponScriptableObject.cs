@@ -16,6 +16,6 @@ public class WeaponScriptableObject : ScriptableObject
 {
     public DamageType damageType;
     public string weaponName;
-    public float baseDamage;
+    public int baseDamage;
     public Sprite weaponSprite;
 }
