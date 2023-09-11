@@ -51,7 +51,6 @@ public class TargetComponent : MonoBehaviour
         TargetData[] activeTargets =  initialTargets.Where(target => target.currentHealth > 0).ToArray();
         if (activeTargets.Length == 0)
         {
-            BattleManager.Instance.EndBattle();
             Destroy(this.gameObject);
             return;
         } 
@@ -60,9 +59,6 @@ public class TargetComponent : MonoBehaviour
 
     public void SelectTarget()
     {
-
-        if (!BattleManager.Instance.bInBattle)
-            return;
         if (Input.GetKeyUp(KeyCode.RightArrow)) 
         {
             targetIndex = ++ targetIndex % targets.Length;

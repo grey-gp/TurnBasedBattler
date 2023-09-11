@@ -3,8 +3,6 @@ using UnityEngine;
 public class FightComponent : MonoBehaviour
 {
 
-    public GameObject enemy;
-    public Transform spawnPoint;
     public float currentSpeed;
     public float InitialSpeed { get; private set; }
 
@@ -27,29 +25,12 @@ public class FightComponent : MonoBehaviour
         currentSpeed = InitialSpeed;
     }
 
-    // Update is called once per frame
-    void Update()
+    public void SelectTarget()
     {
-        if (!BattleManager.Instance.bInBattle && Input.GetKeyDown(KeyCode.F))
-        {
-            var instancedEnemy = BattleManager.Instance.StartBattle(enemy, spawnPoint);
-            _targetComponent = instancedEnemy.GetComponent<TargetComponent>();
-            _targetComponent.StartBattle();
-        }
+        _targetComponent.SelectTarget();
     }
 
-    public void TakeTurn()
-    {
-        if (BattleManager.Instance.bInBattle && _targetComponent != null)
-            _targetComponent.SelectTarget();
-        if (BattleManager.Instance.bInBattle && Input.GetKeyDown(KeyCode.Space))
-        {
-            Attack();
-            
-        }
-    }
-
-    void Attack()
+    public void Attack()
     {
         _targetComponent.AttackTarget(_weaponData.baseDamage * attackPower);
         Debug.Log($"{gameObject.name} is attacking {_targetComponent.SelectedTarget.targetName} with {_weaponData.weaponName} for {_weaponData.baseDamage} damage!");

@@ -1,62 +1,88 @@
-using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
+
+public enum BattleState 
+{
+    START,
+    PLAYERTURN,
+    ENEMYTURN,
+    WON,
+    LOST
+}
+
 
 public class BattleManager : MonoBehaviour
 {
-    public static BattleManager Instance { get; private set; }
-    public GameObject playerObject;
-    public bool bInBattle = false;
+    public BattleState state;
 
-    private List<GameObject> _turnOrder;
+    private FightComponent _playerUnit;
+    private FightComponent _enemyUnit;
+    
+    public GameObject playerPrefab;
+    public Transform playerSpawnPoint;
 
-    public void Awake()
-    {
-        if (Instance != null && Instance != this) 
-        {
-            Destroy(this);
-        } 
-        else
-        {
-            Instance = this;
-        }
-    }
+    public GameObject enemyPrefab;
+    public Transform enemySpawnPoint;
+
 
     public void Start()
     {
-        playerObject = GameObject.FindGameObjectWithTag("Player");
+        state = BattleState.START;
+        StartCoroutine(SetupBattle());
     }
 
+    IEnumerator SetupBattle()
+    {
+        GameObject playerObject = Instantiate(playerPrefab, playerSpawnPoint);
+        _playerUnit = playerObject.GetComponent<FightComponent>();
 
-    private void Battle()
-    {
-        while (bInBattle)
+        GameObject enemyObject = Instantiate(enemyPrefab, enemySpawnPoint);
+        _enemyUnit = enemyObject.GetComponent<FightComponent>();
+
+        yield return new WaitForSeconds(2f);
+
+        state = _playerUnit.InitialSpeed >= _enemyUnit.InitialSpeed ? BattleState.PLAYERTURN : BattleState.ENEMYTURN;
+        if (state == BattleState.PLAYERTURN)
         {
-            
-        }
-    }
-    
-    public GameObject StartBattle(GameObject enemy, Transform spawnPoint)
-    {
-        bInBattle = true;
-        var instancedEnemy = Instantiate(enemy, spawnPoint.position, spawnPoint.rotation);
-        if (instancedEnemy.GetComponent<FightComponent>().InitialSpeed >
-            playerObject.GetComponent<FightComponent>().InitialSpeed)
-        {
-            _turnOrder.Add(instancedEnemy);
-            _turnOrder.Add(playerObject);
-        }
+            PlayerTurn();
+        } 
         else
         {
-            _turnOrder.Add(playerObject);
-            _turnOrder.Add(instancedEnemy);
+            EnemyTurn();
         }
-
-        return instancedEnemy;
     }
 
-    public void EndBattle()
+    public void SelectTarget()
     {
-        bInBattle = false;
+        if (state != BattleState.PLAYERTURN)
+            return;
+
+        _playerUnit.SelectTarget();
+    }
+
+    public void OnPlayerAttack()
+    {
+        if (state != BattleState.PLAYERTURN)
+            return;
+
+        StartCoroutine(PlayerAttack());
+    }
+
+    IEnumerator PlayerAttack()
+    {
+        _playerUnit.Attack();
+        yield return new WaitForSeconds(2f);
+        
+    }
+
+    private void PlayerTurn()
+    {
+
+    }
+
+    private void EnemyTurn()
+    {
+
     }
 
 }
