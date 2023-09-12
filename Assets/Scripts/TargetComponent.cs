@@ -9,6 +9,12 @@ public class  TargetData {
     public float hitChance;
     public DamageType resistance;
     public DamageType weakness;
+
+
+    public void TakeDamage(int damage)
+    {
+        currentHealth -= damage;
+    }
 }
 
 public class TargetComponent : MonoBehaviour
