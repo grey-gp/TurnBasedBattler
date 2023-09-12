@@ -3,37 +3,34 @@ using UnityEngine;
 public class FightComponent : MonoBehaviour
 {
 
-    public float currentSpeed;
-    public float InitialSpeed { get; private set; }
-
-    private TargetComponent _targetComponent;
-
-    [SerializeField]
-    private WeaponScriptableObject _weaponData;
-
-    [SerializeField]
-    private int attackPower;
+    public int maxHealth;
+    public int currentHealth;
+    public int currentSpeed;
+    public int InitialSpeed { get; private set; }
+    public int attackPower;
+    public WeaponScriptableObject weaponData;
 
     // Start is called before the first frame update
     void Start()
     {
-        if (_weaponData == null)
+        if (weaponData == null)
         {
-            _weaponData = Resources.Load<WeaponScriptableObject>("Weapons/Dagger");
+            weaponData = Resources.Load<WeaponScriptableObject>("Weapons/Dagger");
         }
 
+        currentHealth = maxHealth;
         currentSpeed = InitialSpeed;
     }
 
-    public void SelectTarget()
-    {
-        _targetComponent.SelectTarget();
-    }
 
     public void Attack()
     {
-        _targetComponent.AttackTarget(_weaponData.baseDamage * attackPower);
-        Debug.Log($"{gameObject.name} is attacking {_targetComponent.SelectedTarget.targetName} with {_weaponData.weaponName} for {_weaponData.baseDamage} damage!");
+
+    }
+
+    public void TakeDamage(int damage)
+    {
+        currentHealth -= damage;
     }
 
 }

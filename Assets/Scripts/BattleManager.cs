@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using TMPro;
 
 public enum BattleState 
 {
@@ -7,7 +8,8 @@ public enum BattleState
     PLAYERTURN,
     ENEMYTURN,
     WON,
-    LOST
+    LOST,
+    END
 }
 
 
@@ -17,6 +19,10 @@ public class BattleManager : MonoBehaviour
 
     private FightComponent _playerUnit;
     private FightComponent _enemyUnit;
+
+    private TargetData[] _playerTargets;
+    private TargetData[] _enemyTargets;
+    private int _targetIndex = 0;
     
     public GameObject playerPrefab;
     public Transform playerSpawnPoint;
@@ -24,6 +30,7 @@ public class BattleManager : MonoBehaviour
     public GameObject enemyPrefab;
     public Transform enemySpawnPoint;
 
+    public TMP_Text dialogueText;
 
     public void Start()
     {
@@ -35,9 +42,11 @@ public class BattleManager : MonoBehaviour
     {
         GameObject playerObject = Instantiate(playerPrefab, playerSpawnPoint);
         _playerUnit = playerObject.GetComponent<FightComponent>();
+        _playerTargets = playerObject.GetComponent<TargetComponent>().initialTargets;
 
         GameObject enemyObject = Instantiate(enemyPrefab, enemySpawnPoint);
         _enemyUnit = enemyObject.GetComponent<FightComponent>();
+        _enemyTargets = enemyObject.GetComponent<TargetComponent>().initialTargets;
 
         yield return new WaitForSeconds(2f);
 
@@ -48,7 +57,20 @@ public class BattleManager : MonoBehaviour
         } 
         else
         {
-            EnemyTurn();
+            StartCoroutine(EnemyAttack());
+        }
+    }
+
+    private void EndBattle()
+    {
+        if (state == BattleState.WON)
+        {
+            dialogueText.text = "The player has won!";
+            Destroy(_enemyUnit);
+        } 
+        else 
+        {
+            dialogueText.text = "Game Over";
         }
     }
 
@@ -57,10 +79,17 @@ public class BattleManager : MonoBehaviour
         if (state != BattleState.PLAYERTURN)
             return;
 
-        _playerUnit.SelectTarget();
     }
 
-    public void OnPlayerAttack()
+    public void NextTarget()
+    {
+        if (state != BattleState.PLAYERTURN)
+            return;
+
+        _targetIndex = ++_targetIndex % _enemyTargets.Length;
+    }
+
+    public void OnAttack()
     {
         if (state != BattleState.PLAYERTURN)
             return;
@@ -70,9 +99,22 @@ public class BattleManager : MonoBehaviour
 
     IEnumerator PlayerAttack()
     {
-        _playerUnit.Attack();
-        yield return new WaitForSeconds(2f);
-        
+        yield return new WaitForSeconds(1f);
+        _enemyUnit.TakeDamage(_playerUnit.attackPower * _playerUnit.weaponData.baseDamage);
+        dialogueText.text = $"Enemy has taken {_playerUnit.attackPower * _playerUnit.weaponData.baseDamage} damage";
+        yield return new WaitForSeconds(1f);
+        dialogueText.text = "";
+
+        if (_enemyUnit.currentHealth <= 0)
+        {
+            state = BattleState.WON;
+            EndBattle();
+        } 
+        else 
+        {
+            state = BattleState.ENEMYTURN;
+            StartCoroutine(EnemyAttack());
+        }
     }
 
     private void PlayerTurn()
@@ -80,9 +122,23 @@ public class BattleManager : MonoBehaviour
 
     }
 
-    private void EnemyTurn()
+    IEnumerator EnemyAttack()
     {
+        yield return new WaitForSeconds(2f);
+        _playerUnit.TakeDamage(_enemyUnit.attackPower * _enemyUnit.weaponData.baseDamage);
+        
+        dialogueText.text = $"Player has taken {_playerUnit.attackPower * _playerUnit.weaponData.baseDamage} damage";
 
+        yield return new WaitForSeconds(1f);
+
+        dialogueText.text = "";
+
+        if (_playerUnit.currentHealth <= 0)
+        {
+            state = BattleState.LOST;
+            EndBattle();
+        }
+        else 
+            state = BattleState.PLAYERTURN;
     }
-
 }

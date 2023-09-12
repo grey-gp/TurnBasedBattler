@@ -98,11 +98,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d679de2ef78b4794b47f51c505da6c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemy: {fileID: 1899357960595252719, guid: 2e2657cf3245a45beb220f979b78cd0b, type: 3}
-  spawnPoint: {fileID: 0}
+  maxHealth: 50
+  currentHealth: 0
   currentSpeed: 7
-  _weaponData: {fileID: 0}
   attackPower: 5
+  weaponData: {fileID: 0}
 --- !u!114 &3290808049283582841
 MonoBehaviour:
   m_ObjectHideFlags: 0

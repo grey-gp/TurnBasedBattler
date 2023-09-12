@@ -123,8 +123,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d679de2ef78b4794b47f51c505da6c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemy: {fileID: 0}
-  spawnPoint: {fileID: 0}
+  maxHealth: 50
+  currentHealth: 0
   currentSpeed: 4
-  _weaponData: {fileID: 11400000, guid: 1bca3959e352b43b88d60dafcb40e46b, type: 2}
   attackPower: 3
+  weaponData: {fileID: 0}
